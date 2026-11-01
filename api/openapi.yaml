@@ -7,6 +7,36 @@ servers:
   - url: http://localhost:8080
 
 paths:
+  /health:
+    get:
+      summary: Проверить доступность API
+      operationId: getHealth
+      responses:
+        '200':
+          description: Получение данных о состоянии сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /tasks/{id}:
+    get:
+      summary: Получить отчёт по задаче
+      operationId: getTask
+      parameters:
+       - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: Успешное получение статуса задачи
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTaskResponse'
+        '404':
+          description: Не найдено задачи с таким ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /tasks:
     post:
       summary: Выложить задачу, которую потом обработает сервер
@@ -37,7 +67,64 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      description: ID задачи в UUID
+      schema:
+        type: string
+        format: uuid
   schemas:
+    HealthResponse:
+      type: object
+      required: [status, response_time_ms]
+      properties:
+        status:
+          type: string
+          enum:
+            - ok
+        response_time_ms:
+          type: integer
+          minimum: 0
+    GetTaskResponse:
+      type: object
+      required: [id, status, attempts, created_at, started_at, finished_at, result, error]
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - pending
+            - running
+            - completed
+            - failed
+        attempts:
+          type: integer
+          minimum: 0
+        created_at:
+          type: string
+          format: date-time
+        started_at:
+          type: string
+          format: date-time
+          nullable: true
+        finished_at:
+          type: string
+          format: date-time
+          nullable: true
+        result:
+          $ref: '#/components/schemas/Result'
+        error:
+          type: object
+          required: [error]
+          nullable: true
+          properties:
+            error:
+              $ref: '#/components/schemas/ErrorResponse'
     PostTaskRequest:
       type: object
       required: [report_type,parameters]
@@ -68,6 +155,9 @@ components:
         created_at:
           type: string
           format: date-time
+    Result:
+      type: object
+      nullable: true
     ErrorResponse:
       type: object
       required: [message]
