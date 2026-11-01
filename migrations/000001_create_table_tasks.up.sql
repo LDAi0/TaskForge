@@ -1,7 +1,7 @@
 CREATE TABLE public.tasks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     report_type TEXT NOT NULL,
-    parametres JSONB,
+    parameters JSONB,
     status TEXT,
     result JSONB DEFAULT NULL,
     error TEXT,
