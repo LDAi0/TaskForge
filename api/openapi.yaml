@@ -37,6 +37,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Внутренняя ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /tasks:
     post:
       summary: Выложить задачу, которую потом обработает сервер
@@ -119,12 +125,7 @@ components:
         result:
           $ref: '#/components/schemas/Result'
         error:
-          type: object
-          required: [error]
-          nullable: true
-          properties:
-            error:
-              $ref: '#/components/schemas/ErrorResponse'
+            $ref: '#/components/schemas/TaskError'
     PostTaskRequest:
       type: object
       required: [report_type,parameters]
@@ -158,6 +159,21 @@ components:
     Result:
       type: object
       nullable: true
+      required: [summary]
+      properties: 
+        summary:
+          type: string      
+    TaskError:
+      type: object
+      required: [message]
+      nullable: true
+      properties:
+        message:
+          type: string
+          description: Человекочитаемое описание ошибки
+        details:
+          type: string
+          description: Дополнительная информация
     ErrorResponse:
       type: object
       required: [message]

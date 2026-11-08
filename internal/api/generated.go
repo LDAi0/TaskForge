@@ -93,11 +93,9 @@ type ErrorResponse struct {
 
 // GetTaskResponse defines model for GetTaskResponse.
 type GetTaskResponse struct {
-	Attempts  int       `json:"attempts"`
-	CreatedAt time.Time `json:"created_at"`
-	Error     *struct {
-		Error ErrorResponse `json:"error"`
-	} `json:"error"`
+	Attempts   int                   `json:"attempts"`
+	CreatedAt  time.Time             `json:"created_at"`
+	Error      *TaskError            `json:"error"`
 	FinishedAt *time.Time            `json:"finished_at"`
 	Id         openapi_types.UUID    `json:"id"`
 	Result     *Result               `json:"result"`
@@ -139,7 +137,18 @@ type PostTaskResponse struct {
 type PostTaskResponseStatus string
 
 // Result defines model for Result.
-type Result = map[string]interface{}
+type Result struct {
+	Summary string `json:"summary"`
+}
+
+// TaskError defines model for TaskError.
+type TaskError struct {
+	// Details Дополнительная информация
+	Details *string `json:"details,omitempty"`
+
+	// Message Человекочитаемое описание ошибки
+	Message string `json:"message"`
+}
 
 // IdPath defines model for IdPath.
 type IdPath = openapi_types.UUID
