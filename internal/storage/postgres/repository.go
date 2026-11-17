@@ -3,10 +3,10 @@ package postgres
 import (
 	"context"
 	"fmt"
-
+	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
-	"github.com/jackc/pgx/v5/pgtype"
+	//"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"taskforge/internal/task"
@@ -35,14 +35,41 @@ func NewPool(ctx context.Context, databaseURL string) (*pgxpool.Pool, error){
 	return pool, nil
 }
 
-func (r *Repository) Post(ctx context.Context, task.PostInput) (task.Task, error){
+func (r *Repository) Post(ctx context.Context, tsk task.PostInput) (task.Task, error){
 	query := `
 		INSERT INTO public.tasks (report_type, parameters, status)
 		VALUES ($1, $2, $3)
 		RETURNING id, report_type, parameters, status, result, error, attempts, created_at, started_at, finished_at
 	`
 	posted, err := scanTask(r.pool.QueryRow(ctx, query,
+		tsk.ReportType,
+		tsk.Parameters,
+		"pending",
 		))
+	if err!= nil{
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505"{
+			return task.Task{}, task.ErrTaskAlreadyExist
+		}
+		return task.Task{}, fmt.Errorf("post task error in postgres: %w", err)
+	}
+	return posted, nil
+}
+
+func (r *Repository) Get(ctx context.Context, ID string) (task.Task, error){
+	query := `
+		SELECT id, report_type, parameters, status, result, error, attempts, created_at, started_at, finished_at
+		FROM public.tasks
+		WHERE id = $1
+	`
+	t, err := scanTask(r.pool.QueryRow(ctx, query, ID))
+	if err!= nil{
+		if errors.Is(err, pgx.ErrNoRows){
+			return task.Task{}, task.ErrTaskNotFound
+		}
+		return task.Task{}, fmt.Errorf("get task error in postgres: %w", err)
+	}
+	return t, nil
 }
 
 func scanTask(row pgx.Row) (task.Task, error){

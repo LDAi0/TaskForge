@@ -4,7 +4,7 @@ CREATE TABLE public.tasks (
     parameters JSONB NOT NULL,
     status TEXT NOT NULL DEFAULT 'pending',
     result JSONB DEFAULT NULL,
-    error TEXT DEFAULT NULL,
+    error JSONB DEFAULT NULL,
     attempts INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     started_at TIMESTAMPTZ DEFAULT NULL,

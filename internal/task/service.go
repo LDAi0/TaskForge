@@ -10,10 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 var (
-	ReportTypes = []string{"summary"}
+	ReportTypes 		 = []string{"summary"}
 	ErrInvalidPeriodDays = errors.New("invalid period days")
 	ErrInvalidReportType = errors.New("invalid report type")
 	ErrInvalidID 		 = errors.New("invalid ID format(need UUID)")
+	ErrTaskAlreadyExist  = errors.New("task already exist")
+	ErrTaskNotFound		 = errors.New("task not found")
 )
 
 type Repository interface{

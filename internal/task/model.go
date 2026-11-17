@@ -29,5 +29,5 @@ type PostInput struct{
 }
 
 type Result struct{
-
+	Summary string
 }
