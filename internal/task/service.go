@@ -66,6 +66,6 @@ func (s *Service) HealthStatus(ctx context.Context) (HealthStatus, error){
 
 	return HealthStatus{
 		Status: "ok",
-		Response_Time_Ms: int32(time.Since(responseTime)),
+		Response_Time_Ms: int(time.Since(responseTime)),
 	}, nil
 }

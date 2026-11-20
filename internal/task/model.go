@@ -7,7 +7,7 @@ type Task struct{
 	Parameters 	Parameters
 	Status 		string
 	Result 		Result
-	Error 		string
+	Error 		Error
 	Attempts 	int32
 	Created_at 	time.Time
 	Started_at 	time.Time
@@ -16,18 +16,23 @@ type Task struct{
 
 type HealthStatus struct{
 	Status 			 string
-	Response_Time_Ms int32
+	Response_Time_Ms int
 }
 
 type Parameters struct{
-	PeriodDays int16
+	PeriodDays int
 }
 
 type PostInput struct{
-	ReportType string
 	Parameters Parameters
+	ReportType string
 }
 
 type Result struct{
 	Summary string
+}
+
+type Error struct{
+	Details *string
+	Message string
 }
